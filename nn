@@ -1,0 +1,54 @@
+#!/bin/bash
+
+create_db() {
+	sqlite3 $1 -line 'CREATE TABLE notes (
+        id integer primary key autoincrement,
+        epoch_time integer,
+        note varchar[255]
+        );'
+}
+
+write_note() {
+	printf "Write your note. Press ctrl-d when done...\n"
+	note=$(cat)
+	note=$(echo ${note//$'\n'/<br>})
+	epoch=$(date +%s)
+	sqlite3 $1 -line "INSERT INTO notes (epoch_time, note) VALUES ($epoch, \"${note}\");"
+	printf "\n\nEpoch time written\n"
+	printf "========================================\n"
+	printf "%s\n" $epoch
+	printf "\nNote written\n"
+	printf "========================================\n"
+	printf "%s\n" "$note"
+	printf "========================================\n"
+}
+
+read_notes() {
+	{
+		IFS="|"
+		while read a b c; do
+			printf "==========================================\n"
+			printf "Note#%s @%s\n%s\n" $a $(date --date @$b) ${c//<br>/$'\n'}
+		done
+	} <<<$(sqlite3 $1 -list 'SELECT * FROM notes;')
+	printf "==========================================\n"
+}
+
+scriptdir=$(dirname $0)
+printf "Script directory: %s\n" $scriptdir
+printf "Testing for existence of db file ${scriptdir}/nn.db ...\n"
+
+if [[ -f "${scriptdir}/nn.db" ]]; then
+	printf "db file exists...\n"
+	if [[ "read" == $1 ]]; then
+		printf "Reading...\n"
+		read_notes "${scriptdir}/nn.db"
+	else
+		printf "Writing...\n"
+		write_note "${scriptdir}/nn.db"
+	fi
+else
+	printf "db file does not exist...\n"
+	printf "Creating a new database...\n"
+	create_db "${scriptdir}/nn.db"
+fi
