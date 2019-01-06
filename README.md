@@ -17,3 +17,15 @@ The following will read from the db
 ``` bash
 nn read
 ```
+
+Output from the read from db is shown below
+
+> ==========================================
+> Note#1 @Mon Dec 31 19:05:35 +08 2018
+> First entry into my nifty note shell script
+> This is a quick note taking tool for the command line
+> ==========================================
+> Note#2 @Mon Dec 31 19:07:38 +08 2018
+> Linux cmd: whois
+> queries the whois database for information about public ip addresses
+> ==========================================
